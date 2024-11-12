@@ -3,8 +3,7 @@ package com.example.myapplication.barretina;
 import android.os.Bundle;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.ScrollView;
-import android.widget.Button;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,8 +12,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.util.HashSet;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import okhttp3.Response;
 
 public class PruebasActivity extends AppCompatActivity {
+
+    private WebSocket mWebSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,9 +28,18 @@ public class PruebasActivity extends AppCompatActivity {
         // Referencia al RadioGroup donde se añadirán las categorías
         RadioGroup radioGroup = findViewById(R.id.radioGroup);
 
+        // Intentar conectar al servidor Proxmox usando WebSocket (esto ahora se hace desde MainActivity)
+        if (mWebSocket != null) {
+            // Aquí puedes suscribirte para recibir el archivo PRODUCTES.XML
+            mWebSocket.send("request_productes_xml"); // Enviar un mensaje para solicitar el archivo XML
+        }
+    }
+
+    // Método para manejar la recepción del archivo XML desde el servidor
+    public void handleReceivedXML(String xmlContent) {
         try {
-            // Cargar el archivo XML desde los assets
-            InputStream inputStream = getAssets().open("PRODUCTES.XML");
+            // Convertir el contenido recibido (XML) en un InputStream
+            InputStream inputStream = new java.io.ByteArrayInputStream(xmlContent.getBytes());
 
             // Parsear el archivo XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -56,6 +69,7 @@ public class PruebasActivity extends AppCompatActivity {
             }
 
             // Añadir cada categoría única como un RadioButton en el RadioGroup
+            RadioGroup radioGroup = findViewById(R.id.radioGroup);
             for (String categoria : categoriasUnicas) {
                 RadioButton radioButton = new RadioButton(this);
 
@@ -89,6 +103,7 @@ public class PruebasActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(this, "Error al procesar el archivo XML", Toast.LENGTH_SHORT).show();
         }
     }
 
