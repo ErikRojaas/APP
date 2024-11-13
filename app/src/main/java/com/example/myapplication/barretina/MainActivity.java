@@ -7,15 +7,20 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-
+import java.io.OutputStreamWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.xml.sax.InputSource;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,7 +31,6 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private static final String CONFIG_FILE_NAME = "config.xml";
-    private WebSocket mWebSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +55,38 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            // Conectar al servidor WebSocket
+            // Crear el documento XML
+            DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+            Document document = documentBuilder.newDocument();
+
+            // Crear el nodo raíz
+            Element root = document.createElement("config");
+            document.appendChild(root);
+
+            // Crear el elemento URL
+            Element urlElement = document.createElement("url");
+            urlElement.appendChild(document.createTextNode(url));
+            root.appendChild(urlElement);
+
+            // Crear el elemento Nombre
+            Element nombreElement = document.createElement("nombre");
+            nombreElement.appendChild(document.createTextNode(nom));
+            root.appendChild(nombreElement);
+
+            // Crear el transformer para escribir el XML
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty("indent", "yes");
+
+            // Guardar el documento XML en el almacenamiento interno
+            FileOutputStream fileOutputStream = openFileOutput(CONFIG_FILE_NAME, MODE_PRIVATE);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+            transformer.transform(new DOMSource(document), new StreamResult(outputStreamWriter));
+
+            Toast.makeText(this, "Configuració guardada correctament", Toast.LENGTH_SHORT).show();
+
+            // Conectar con el servidor Proxmox a través de WebSocket
             connectToProxmoxWebSocket();
 
             // Cambiar a otra actividad si es necesario
@@ -65,8 +100,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connectToProxmoxWebSocket() {
+        // Crear el cliente WebSocket
         OkHttpClient client = new OkHttpClient();
-        String serverUrl = "wss://barretina5.ieti.site";
+
+        // Crear la URL de conexión WebSocket
+        String serverUrl = "wss://barretina5.ieti.site"; // WebSocket sobre puerto 443
 
         // Crear una solicitud WebSocket
         Request request = new Request.Builder()
@@ -80,19 +118,13 @@ public class MainActivity extends AppCompatActivity {
                 super.onOpen(webSocket, response);
                 runOnUiThread(() -> {
                     Toast.makeText(MainActivity.this, "Conectado a Proxmox", Toast.LENGTH_SHORT).show();
-                    // Solicitar el archivo PRODUCTES.XML
-                    mWebSocket = webSocket;
-                    mWebSocket.send("request_productes_xml"); // Enviar la solicitud para obtener el archivo PRODUCTES.XML
                 });
             }
 
             @Override
             public void onMessage(WebSocket webSocket, String text) {
                 super.onMessage(webSocket, text);
-                // Enviar el archivo XML a la actividad de pruebas
-                Intent intent = new Intent(MainActivity.this, PruebasActivity.class);
-                intent.putExtra("productes_xml", text); // Pasa el XML como string
-                startActivity(intent);
+                // Aquí puedes manejar los mensajes del servidor Proxmox si es necesario
             }
 
             @Override
@@ -111,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
     // Método para cargar la configuración desde un archivo XML
     public void cargarConfig() {
         try {
-            // Intentar leer el archivo XML de configuración
+            // Intentar leer el archivo XML
             FileInputStream fileInputStream = openFileInput(CONFIG_FILE_NAME);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
