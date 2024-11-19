@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import javax.xml.parsers.DocumentBuilder;
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             connectToProxmoxWebSocket();
 
             // Cambiar a otra actividad si es necesario
-            Intent intent = new Intent(MainActivity.this, PruebasActivity.class);
+            Intent intent = new Intent(MainActivity.this, Mesas.class);
             startActivity(intent);
 
         } catch (Exception e) {

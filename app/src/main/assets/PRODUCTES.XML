@@ -138,7 +138,7 @@
         <foto>coulant.jpg</foto>
         <precio>5.5</precio>
     </producto>
-    <producto id="24" categoria="bebida">
+    <producto id="24" categoria="postre">
         <nombre>Sorbete de Limon</nombre>
         <descripcion>Sorbete De LimÓn Al Cava</descripcion>
         <foto>sorbete.jpg</foto>
