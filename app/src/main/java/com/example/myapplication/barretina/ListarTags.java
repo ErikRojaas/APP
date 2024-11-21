@@ -155,8 +155,6 @@ public class ListarTags extends AppCompatActivity {
 
             // Hacer que toda la línea sea clicable
             productoView.setOnClickListener(v -> {
-                // Lógica cuando se haga clic en un producto
-                Toast.makeText(this, "Producto seleccionado: " + p.getNombre(), Toast.LENGTH_SHORT).show();
 
                 boolean puesto = false;
                 for (Producto a : productosSeleccionados) {

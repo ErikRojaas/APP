@@ -78,7 +78,6 @@ public class Mesas extends AppCompatActivity {
                 public void onClick(View v) {
                     // Crear un Intent para abrir MesaDetalleActivity
                     Intent intent = new Intent(Mesas.this, Comandas.class);
-                    Toast.makeText(Mesas.this, "Has entrado a " + circleButton.getText().toString(), Toast.LENGTH_SHORT).show();
 
                     // Pasar el nombre de la mesa al Intent
                     intent.putExtra("nombreMesa", circleButton.getText().toString());
@@ -128,7 +127,6 @@ public class Mesas extends AppCompatActivity {
                         // Crear un Intent para abrir MesaDetalleActivity
                         Intent intent = new Intent(Mesas.this, Comandas.class);
 
-                        Toast.makeText(Mesas.this, "Has entrado a " + secondCircleButton.getText().toString(), Toast.LENGTH_SHORT).show();
                         // Pasar el nombre de la mesa al Intent
                         intent.putExtra("nombreMesa", secondCircleButton.getText().toString());
 

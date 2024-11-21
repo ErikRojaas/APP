@@ -58,7 +58,7 @@ public class Comandas extends AppCompatActivity {
         // Configurar el botón ENVIAR
         Button btnEnviar = findViewById(R.id.btnEnviar);
         btnEnviar.setOnClickListener(v ->
-                Toast.makeText(Comandas.this, "Has clicado en enviar", Toast.LENGTH_SHORT).show()
+                Toast.makeText(Comandas.this, "Has clicado en enviar.", Toast.LENGTH_SHORT).show()
         );
 
         // Configurar el botón ATRÁS
@@ -158,7 +158,6 @@ public class Comandas extends AppCompatActivity {
                         productosMesa.remove(producto); // Eliminar si la cantidad es 1
                     }
                     actualizarVistaComanda(); // Actualizar la vista
-                    Toast.makeText(Comandas.this, "Producto " + producto.getNombre() + " eliminado de la comanda.", Toast.LENGTH_SHORT).show();
                 });
 
                 // Añadir elementos al layout del producto
