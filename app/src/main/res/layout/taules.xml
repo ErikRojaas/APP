@@ -11,14 +11,14 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BAR RETINA"
-        android:textSize="30sp"
-        android:textColor="#CC0000"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/verdana"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:text="BAR RETINA"
+        android:textColor="#CC0000"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- ScrollView para los círculos de las mesas -->
     <ScrollView
@@ -45,15 +45,15 @@
 
     <ImageButton
         android:id="@+id/imageButton4"
-        android:layout_width="41dp"
-        android:layout_height="45dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="#00FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.881"
+        app:layout_constraintHorizontal_bias="0.733"
         app:layout_constraintStart_toEndOf="@+id/title"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023"
-        app:srcCompat="@android:drawable/ic_menu_manage" />
+        app:layout_constraintVertical_bias="0.812"
+        app:srcCompat="@drawable/settings" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
