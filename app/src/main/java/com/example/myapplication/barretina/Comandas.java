@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.LinearLayout;
 
+import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
 
 import java.util.List;
 
@@ -32,6 +35,17 @@ public class Comandas extends AppCompatActivity {
         }
 
         actualizarVistaComanda();
+
+        ImageButton novaComanda = findViewById(R.id.novaComanda);
+        novaComanda.setOnClickListener(view -> {
+            List<ListarTags.Producto> productosMesa = Mesas.comandas.get(numMesa);
+            if (productosMesa == null || productosMesa.isEmpty()){
+                Toast.makeText(Comandas.this, "No hay ninguna comanda registrada.", Toast.LENGTH_SHORT).show();
+            } else {
+                Mesas.comandas.get(numMesa).clear();
+                actualizarVistaComanda();
+            }
+        });
 
         // Configurar el botón AÑADIR para abrir la actividad ListarTags
         Button btnAnadir = findViewById(R.id.btnAnadir);
@@ -66,20 +80,26 @@ public class Comandas extends AppCompatActivity {
 
         List<ListarTags.Producto> productosMesa = Mesas.comandas.get(numMesa);
 
+        TextView precioFinalTextView = findViewById(R.id.precioFinal);
+
         if (productosMesa == null || productosMesa.isEmpty()) {
+            // Mostrar mensaje de "No hay productos"
             TextView mensaje = new TextView(this);
             mensaje.setText("No hay productos seleccionados.");
             mensaje.setTextColor(getResources().getColor(android.R.color.white));
             mensaje.setTextSize(18);
             mensaje.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             contenedor.addView(mensaje);
+
+            // Ocultar el precio total
+            precioFinalTextView.setText("Precio Total: 0.0€");
         } else {
             double precioTotal = 0;
             for (ListarTags.Producto producto : productosMesa) {
                 precioTotal += producto.getPrecio() * producto.getCantidad();
             }
 
-            TextView precioFinalTextView = findViewById(R.id.precioFinal);
+            // Mostrar el precio total
             precioFinalTextView.setText("Precio Total: " + String.format("%.1f", precioTotal) + "€");
 
             for (ListarTags.Producto producto : productosMesa) {
@@ -87,28 +107,67 @@ public class Comandas extends AppCompatActivity {
                 productoLayout.setOrientation(LinearLayout.HORIZONTAL);
                 productoLayout.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
 
+                // Cantidad del producto
                 TextView cantidadProducto = new TextView(this);
                 cantidadProducto.setText("x" + producto.getCantidad());
                 cantidadProducto.setTextColor(getResources().getColor(android.R.color.white));
                 cantidadProducto.setTextSize(16);
                 cantidadProducto.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
 
+                // Nombre del producto
                 TextView nombreProducto = new TextView(this);
                 nombreProducto.setText(producto.getNombre());
                 nombreProducto.setTextColor(getResources().getColor(android.R.color.white));
                 nombreProducto.setTextSize(16);
                 nombreProducto.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 2));
 
+                // Precio del producto
                 TextView precioProducto = new TextView(this);
                 precioProducto.setText(String.format("%.1f€", producto.getPrecio()));
                 precioProducto.setTextColor(getResources().getColor(android.R.color.white));
                 precioProducto.setTextSize(16);
                 precioProducto.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
 
+                // Botón "menos"
+                Button btnMenos = new Button(this);
+                btnMenos.setText("-");
+                btnMenos.setTextSize(14);
+                btnMenos.setTextColor(getResources().getColor(android.R.color.white)); // Color blanco para el texto
+                btnMenos.setBackground(null); // Sin fondo
+                btnMenos.setPadding(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
+
+                // Sombra del botón
+                btnMenos.setElevation(dpToPx(4)); // Elevación (asegúrate de que funcione con ViewCompat)
+
+                // Alternativa para dispositivos sin sombra visible (compatibilidad)
+                ViewCompat.setElevation(btnMenos, dpToPx(4));
+
+                // Configuración de tamaño
+                LinearLayout.LayoutParams btnLayoutParams = new LinearLayout.LayoutParams(
+                        dpToPx(32), // Ancho
+                        dpToPx(32)  // Alto
+                );
+                btnLayoutParams.setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4)); // Margen opcional
+                btnMenos.setLayoutParams(btnLayoutParams);
+
+                // Acción del botón
+                btnMenos.setOnClickListener(v -> {
+                    if (producto.getCantidad() > 1) {
+                        producto.setCantidad(producto.getCantidad() - 1); // Restar 1 a la cantidad
+                    } else {
+                        productosMesa.remove(producto); // Eliminar si la cantidad es 1
+                    }
+                    actualizarVistaComanda(); // Actualizar la vista
+                    Toast.makeText(Comandas.this, "Producto " + producto.getNombre() + " eliminado de la comanda.", Toast.LENGTH_SHORT).show();
+                });
+
+                // Añadir elementos al layout del producto
                 productoLayout.addView(cantidadProducto);
                 productoLayout.addView(nombreProducto);
                 productoLayout.addView(precioProducto);
+                productoLayout.addView(btnMenos);
 
+                // Margen inferior entre productos
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) productoLayout.getLayoutParams();
                 if (params != null) {
                     params.setMargins(0, 0, 0, dpToPx(8));
@@ -119,6 +178,7 @@ public class Comandas extends AppCompatActivity {
             }
         }
     }
+
 
     private int dpToPx(int sp) {
         float density = getResources().getDisplayMetrics().density;
