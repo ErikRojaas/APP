@@ -30,13 +30,12 @@
             android:exported="true">
         </activity>
 
-        <activity android:name=".Comandas">
+        <activity android:name=".Comandas"/>
 
-        </activity>
+        <activity android:name=".ListarTags"/>
 
-        <activity android:name=".ListarTags">
+        <activity android:name=".ConfigActivity" />
 
-        </activity>
 
 
 

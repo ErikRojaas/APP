@@ -30,7 +30,7 @@
         android:backgroundTint="#CC0000"
         android:fontFamily="@font/verdana"
         android:onClick="guardarConfig"
-        android:text="ENTRAR"
+        android:text="GUARDAR"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

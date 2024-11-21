@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +26,12 @@ public class Mesas extends AppCompatActivity {
         setContentView(R.layout.taules);  // Asegúrate de tener este layout creado
 
         LinearLayout container = findViewById(R.id.circlesContainer);  // Contenedor para las filas
+
+        ImageButton settingsButton = findViewById(R.id.imageButton4);
+        settingsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Mesas.this, ConfigActivity.class);
+            startActivity(intent);
+        });
 
         for (int i = 0; i < 20; i++) {
             comandas.add(new ArrayList<>()); // Crear una lista vacía para cada mesa

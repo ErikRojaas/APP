@@ -80,7 +80,7 @@ public class Comandas extends AppCompatActivity {
             }
 
             TextView precioFinalTextView = findViewById(R.id.precioFinal);
-            precioFinalTextView.setText("Precio Total: " + String.format("%.2f", precioTotal) + "€");
+            precioFinalTextView.setText("Precio Total: " + String.format("%.1f", precioTotal) + "€");
 
             for (ListarTags.Producto producto : productosMesa) {
                 LinearLayout productoLayout = new LinearLayout(this);
@@ -100,7 +100,7 @@ public class Comandas extends AppCompatActivity {
                 nombreProducto.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 2));
 
                 TextView precioProducto = new TextView(this);
-                precioProducto.setText(String.format("%.2f€", producto.getPrecio()));
+                precioProducto.setText(String.format("%.1f€", producto.getPrecio()));
                 precioProducto.setTextColor(getResources().getColor(android.R.color.white));
                 precioProducto.setTextSize(16);
                 precioProducto.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
