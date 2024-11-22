@@ -19,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -37,6 +38,7 @@ import okhttp3.WebSocketListener;
 public class MainActivity extends AppCompatActivity {
 
     private static final String CONFIG_FILE_NAME = "config.xml";
+    public static int userId = 0;
 
     // Crear la URL de conexión WebSocket
     public String serverUrl = "wss://barretina5.ieti.site"; // WebSocket sobre puerto 443
@@ -98,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             // Conectar con el servidor Proxmox a través de WebSocket
             connectToProxmoxWebSocket();
 
-
+            insertBase(nom);
 
 
             // Cambiar a otra actividad si es necesario
@@ -145,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(WebSocket webSocket, Throwable t, Response response) {
                 super.onFailure(webSocket, t, response);
                 runOnUiThread(() -> {
-                    Toast.makeText(MainActivity.this, "Error al conectar a Proxmox: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    connectToProxmoxWebSocket();
                 });
             }
         };
@@ -179,5 +181,42 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "No es va poder carregar la configuració", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void insertBase(String usu){
+        new Thread(() -> {
+            try {
+                //?useSSL=false&logger=com.mysql.cj.log.StandardLogger&logLevel=DEBUG
+                Connection connection = DriverManager.getConnection("jdbc:mysql://10.0.2.2:33007/BarRetina", "xavierik", "X@v13r1k");
+
+                String queryId = "select count(*) from usuario";
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(queryId);
+                int id = 0;
+                while (rs.next()) {
+                    id = rs.getInt("count(*)") + 1;
+                }
+                userId = id;
+
+                String query = "INSERT INTO usuario (id_user,nombre) VALUES (?,?)";
+                try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setInt(1, id);
+                    pstmt.setString(2, usu);
+
+                    pstmt.executeUpdate();
+                    connection.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //Toast.makeText(Comandas.this, "Conectado peta el insert", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                //Toast.makeText(Comandas.this, "falla en el connect", Toast.LENGTH_SHORT).show();
+            }
+        }).start();
+    }
+
+    public static int getUserId() {
+        return userId;
     }
 }

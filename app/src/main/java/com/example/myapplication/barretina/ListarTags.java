@@ -300,5 +300,10 @@ public class ListarTags extends AppCompatActivity {
 
             this.cantidad = c;
         }
+
+        @Override
+        public String toString() {
+            return nombre + ":" + cantidad + ":pedido:" + precio + ",";
+        }
     }
 }

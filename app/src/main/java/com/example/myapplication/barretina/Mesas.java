@@ -7,15 +7,31 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Mesas extends AppCompatActivity {
 
     public static ArrayList<List<ListarTags.Producto>> comandas = new ArrayList<>(20);
+
+    public static int getNumMesa() {
+        return numMesa + 1;
+    }
+
+    public static void setNumMesa(int numMesa) {
+        Mesas.numMesa = numMesa;
+    }
+
+    public static int numMesa;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +45,7 @@ public class Mesas extends AppCompatActivity {
             Intent intent = new Intent(Mesas.this, ConfigActivity.class);
             startActivity(intent);
         });
+        insertBase();
 
         for (int i = 0; i < 20; i++) {
             comandas.add(new ArrayList<>()); // Crear una lista vacía para cada mesa
@@ -80,7 +97,7 @@ public class Mesas extends AppCompatActivity {
                     // Pasar el nombre de la mesa al Intent
                     intent.putExtra("nombreMesa", circleButton.getText().toString());
 
-                    intent.putExtra("numeroMesa", finalI);
+                    setNumMesa(finalI);
 
                     // Iniciar la nueva actividad
                     startActivity(intent);
@@ -129,7 +146,7 @@ public class Mesas extends AppCompatActivity {
                         // Pasar el nombre de la mesa al Intent
                         intent.putExtra("nombreMesa", secondCircleButton.getText().toString());
 
-                        intent.putExtra("numeroMesa", finalI1 + 1);
+                        setNumMesa(finalI1 + 1);
 
                         // Iniciar la nueva actividad
                         startActivity(intent);
@@ -149,5 +166,56 @@ public class Mesas extends AppCompatActivity {
             // Agregar la fila de círculos (en cuadrados invisibles) al contenedor principal
             container.addView(rowLayout);
         }
+    }
+
+    private void insertBase(){
+        new Thread(() -> {
+            try {
+                deleteBase();
+
+                //?useSSL=false&logger=com.mysql.cj.log.StandardLogger&logLevel=DEBUG
+                Connection connection = DriverManager.getConnection("jdbc:mysql://10.0.2.2:33007/BarRetina", "xavierik", "X@v13r1k");
+
+                for (int i = 0; i < 20; i++) {
+                    String query = "insert into mesa (id_mesa,estado) value (?,?)";
+                    int idMesa = i + 1;
+                    try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                        pstmt.setInt(1, idMesa);
+                        pstmt.setString(2, "Libre");
+
+                        pstmt.executeUpdate();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //Toast.makeText(Comandas.this, "Conectado peta el insert", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                connection.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                //Toast.makeText(Comandas.this, "falla en el connect", Toast.LENGTH_SHORT).show();
+            }
+        }).start();
+    }
+
+    private void deleteBase(){
+        new Thread(() -> {
+            try {
+                //?useSSL=false&logger=com.mysql.cj.log.StandardLogger&logLevel=DEBUG
+                Connection connection = DriverManager.getConnection("jdbc:mysql://10.0.2.2:33007/BarRetina", "xavierik", "X@v13r1k");
+                String query = "delete from mesa";
+                try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                    pstmt.executeUpdate();
+                    connection.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //Toast.makeText(Comandas.this, "Conectado peta el insert", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                //Toast.makeText(Comandas.this, "falla en el connect", Toast.LENGTH_SHORT).show();
+            }
+        }).start();
     }
 }

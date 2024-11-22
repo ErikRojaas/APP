@@ -15,12 +15,13 @@ import androidx.core.view.ViewCompat;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 
 public class Comandas extends AppCompatActivity {
 
-    int numMesa = 0;
+    boolean subida = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +30,6 @@ public class Comandas extends AppCompatActivity {
 
         // Obtener el nombre de la mesa desde el Intent
         String nombreMesa = getIntent().getStringExtra("nombreMesa");
-        numMesa = getIntent().getIntExtra("numeroMesa", -1);
 
         // Establecer el nombre de la mesa en el TextView
         TextView nombreMesaTextView = findViewById(R.id.nombreMesa);
@@ -41,27 +41,43 @@ public class Comandas extends AppCompatActivity {
 
         ImageButton novaComanda = findViewById(R.id.novaComanda);
         novaComanda.setOnClickListener(view -> {
-            List<ListarTags.Producto> productosMesa = Mesas.comandas.get(numMesa);
+            List<ListarTags.Producto> productosMesa = Mesas.comandas.get(Mesas.getNumMesa());
             if (productosMesa == null || productosMesa.isEmpty()){
                 Toast.makeText(Comandas.this, "No hay ninguna comanda registrada.", Toast.LENGTH_SHORT).show();
             } else {
-                Mesas.comandas.get(numMesa).clear();
+                Mesas.comandas.get(Mesas.getNumMesa()).clear();
                 actualizarVistaComanda();
             }
+            subida = true;
         });
 
         // Configurar el botón AÑADIR para abrir la actividad ListarTags
         Button btnAnadir = findViewById(R.id.btnAnadir);
         btnAnadir.setOnClickListener(v -> {
             Intent intent = new Intent(Comandas.this, ListarTags.class);
-            intent.putExtra("numeroMesa", numMesa);
+            intent.putExtra("numeroMesa", Mesas.getNumMesa());
             startActivityForResult(intent, 1);
         });
 
         // Configurar el botón ENVIAR
         Button btnEnviar = findViewById(R.id.btnEnviar);
-        btnEnviar.setOnClickListener(v ->
-                insertBase()
+        btnEnviar.setOnClickListener(v -> {
+                if (subida) {
+                    StringBuilder cadena = new StringBuilder();
+                    for (ListarTags.Producto p : Mesas.comandas.get(Mesas.getNumMesa())){
+                        cadena.append(p.toString());
+                    }
+                    insertBase(Mesas.getNumMesa(), String.valueOf(cadena));
+                    subida = false;
+                } else {
+                    StringBuilder cadena = new StringBuilder();
+                    for (ListarTags.Producto p : Mesas.comandas.get(Mesas.getNumMesa())){
+                        cadena.append(p.toString());
+                    }
+                    updateBase(Mesas.getNumMesa(), String.valueOf(cadena));
+                }
+                }
+                //insertBase()
                 //Toast.makeText(Comandas.this, "Has clicado en enviar", Toast.LENGTH_SHORT).show()
         );
 
@@ -104,7 +120,7 @@ public class Comandas extends AppCompatActivity {
         LinearLayout contenedor = findViewById(R.id.contenedorProductos);
         contenedor.removeAllViews();
 
-        List<ListarTags.Producto> productosMesa = Mesas.comandas.get(numMesa);
+        List<ListarTags.Producto> productosMesa = Mesas.comandas.get(Mesas.getNumMesa());
 
         TextView precioFinalTextView = findViewById(R.id.precioFinal);
 
@@ -208,5 +224,65 @@ public class Comandas extends AppCompatActivity {
     private int dpToPx(int sp) {
         float density = getResources().getDisplayMetrics().density;
         return (int) (sp * density + 0.5f);
+    }
+
+    private void updateBase(int numMesa, String comanda){
+        new Thread(() -> {
+            try {
+                //?useSSL=false&logger=com.mysql.cj.log.StandardLogger&logLevel=DEBUG
+                Connection connection = DriverManager.getConnection("jdbc:mysql://10.0.2.2:33007/BarRetina", "xavierik", "X@v13r1k");
+                String query = "update comanda set comanda = ? where id_mesa = ? order by id_comanda desc limit 1";
+
+                try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setString(1, comanda);
+                    pstmt.setInt(2, numMesa);
+
+                    pstmt.executeUpdate();
+                    connection.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void insertBase(int numMesa, String comanda){
+        new Thread(() -> {
+            try {
+                //?useSSL=false&logger=com.mysql.cj.log.StandardLogger&logLevel=DEBUG
+                Connection connection = DriverManager.getConnection("jdbc:mysql://10.0.2.2:33007/BarRetina", "xavierik", "X@v13r1k");
+
+
+
+                String query = "insert into comanda (id_comanda,id_user,id_mesa,comanda,estado,fecha_comanda) values (?,?,?,?,?,current_time())";
+
+                String queryId = "select count(*) from comanda";
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(queryId);
+                int id = 0;
+                while (rs.next()) {
+                    id = rs.getInt("count(*)") + 1;
+                }
+
+                int userId = MainActivity.getUserId();
+
+                try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setInt(1, id);
+                    pstmt.setInt(2, userId);
+                    pstmt.setInt(3, numMesa);
+                    pstmt.setString(4, comanda);
+                    pstmt.setString(5, "pedido");
+
+                    pstmt.executeUpdate();
+                    connection.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
