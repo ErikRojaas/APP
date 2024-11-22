@@ -5,14 +5,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.LinearLayout;
 
-import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 public class Comandas extends AppCompatActivity {
@@ -58,13 +61,36 @@ public class Comandas extends AppCompatActivity {
         // Configurar el botón ENVIAR
         Button btnEnviar = findViewById(R.id.btnEnviar);
         btnEnviar.setOnClickListener(v ->
-                Toast.makeText(Comandas.this, "Has clicado en enviar.", Toast.LENGTH_SHORT).show()
+                insertBase()
+                //Toast.makeText(Comandas.this, "Has clicado en enviar", Toast.LENGTH_SHORT).show()
         );
 
         // Configurar el botón ATRÁS
         Button btnAtras = findViewById(R.id.btnAtras);
         btnAtras.setOnClickListener(v -> finish());
     }
+
+    private void insertBase(String usu){
+        new Thread(() -> {
+            try {
+                //?useSSL=false&logger=com.mysql.cj.log.StandardLogger&logLevel=DEBUG
+                Connection connection = DriverManager.getConnection("jdbc:mysql://10.0.2.2:33007/BarRetina", "xavierik", "X@v13r1k");
+                String query = "INSERT INTO usuario (nombre) VALUES (?)";
+                try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setString(1, usu);
+
+                    pstmt.executeUpdate();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //Toast.makeText(Comandas.this, "Conectado peta el insert", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                //Toast.makeText(Comandas.this, "falla en el connect", Toast.LENGTH_SHORT).show();
+            }
+        }).start();
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

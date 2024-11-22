@@ -7,13 +7,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 
 public class Mesas extends AppCompatActivity {
@@ -78,6 +75,7 @@ public class Mesas extends AppCompatActivity {
                 public void onClick(View v) {
                     // Crear un Intent para abrir MesaDetalleActivity
                     Intent intent = new Intent(Mesas.this, Comandas.class);
+                    //Toast.makeText(Mesas.this, "Has entrado a " + circleButton.getText().toString(), Toast.LENGTH_SHORT).show();
 
                     // Pasar el nombre de la mesa al Intent
                     intent.putExtra("nombreMesa", circleButton.getText().toString());
@@ -127,6 +125,7 @@ public class Mesas extends AppCompatActivity {
                         // Crear un Intent para abrir MesaDetalleActivity
                         Intent intent = new Intent(Mesas.this, Comandas.class);
 
+                        //Toast.makeText(Mesas.this, "Has entrado a " + secondCircleButton.getText().toString(), Toast.LENGTH_SHORT).show();
                         // Pasar el nombre de la mesa al Intent
                         intent.putExtra("nombreMesa", secondCircleButton.getText().toString());
 
