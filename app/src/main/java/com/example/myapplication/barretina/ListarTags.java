@@ -3,12 +3,8 @@ package com.example.myapplication.barretina;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,14 +13,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class ListarTags extends AppCompatActivity {
 
@@ -156,7 +152,7 @@ public class ListarTags extends AppCompatActivity {
             // Hacer que toda la línea sea clicable
             productoView.setOnClickListener(v -> {
                 // Lógica cuando se haga clic en un producto
-                Toast.makeText(this, "Producto seleccionado: " + p.getNombre(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Producto seleccionado: " + p.getNombre(), Toast.LENGTH_SHORT).show();
 
                 boolean puesto = false;
                 for (Producto a : productosSeleccionados) {
@@ -189,7 +185,7 @@ public class ListarTags extends AppCompatActivity {
         builder.setView(layoutPopup);
         builder.setPositiveButton("Aceptar", (dialog, which) -> {
             // Aquí puedes manejar la lógica para obtener los productos seleccionados
-            Toast.makeText(this, "Productos seleccionados", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Productos seleccionados", Toast.LENGTH_SHORT).show();
         });
 
         builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());

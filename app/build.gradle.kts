@@ -37,9 +37,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    //implementation(files("C:\\Users\\xavi\\Downloads\\mysql-connector-java-8.0.15.jar"))
+    //implementation(files("libs/mysql-connector-j-9.1.0.jar"))
+    implementation(files("libs\\mysql-connector-java-5.1.49.jar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("org.java-websocket:Java-WebSocket:1.5.2")
 }

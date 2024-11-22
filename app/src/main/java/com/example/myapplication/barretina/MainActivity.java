@@ -5,31 +5,41 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.xml.sax.InputSource;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String CONFIG_FILE_NAME = "config.xml";
+
+    // Crear la URL de conexión WebSocket
+    public String serverUrl = "wss://barretina5.ieti.site"; // WebSocket sobre puerto 443
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +98,14 @@ public class MainActivity extends AppCompatActivity {
             // Conectar con el servidor Proxmox a través de WebSocket
             connectToProxmoxWebSocket();
 
+
+
+
             // Cambiar a otra actividad si es necesario
             Intent intent = new Intent(MainActivity.this, Mesas.class);
             startActivity(intent);
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
         // Crear el cliente WebSocket
         OkHttpClient client = new OkHttpClient();
 
-        // Crear la URL de conexión WebSocket
-        String serverUrl = "wss://barretina5.ieti.site"; // WebSocket sobre puerto 443
 
         // Crear una solicitud WebSocket
         Request request = new Request.Builder()
@@ -118,6 +131,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     Toast.makeText(MainActivity.this, "Conectado a Proxmox", Toast.LENGTH_SHORT).show();
                 });
+
+
             }
 
             @Override
@@ -149,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
             Document document = documentBuilder.parse(new InputSource(inputStreamReader));
 
-            // Obtener los elementos del XML
+            // Obtener los elementos del XMLtags
             Element root = document.getDocumentElement();
             String url = root.getElementsByTagName("url").item(0).getTextContent();
             String nombre = root.getElementsByTagName("nombre").item(0).getTextContent();
