@@ -69,10 +69,10 @@ public class Comandas extends AppCompatActivity {
                         // Calcula el precio unitario
                         double precioUnitario = p.getPrecio() / p.getCantidad();
                         for (int i = 0; i < p.getCantidad(); i++) {
-                            cadena.append(p.getNombre()).append(":").append(1).append(":").append(precioUnitario).append(",");
+                            cadena.append(p.getNombre()).append(":").append(1).append(":pedido:").append(precioUnitario).append(",");
                         }
                     } else {
-                        cadena.append(p.getNombre()).append(":").append(p.getCantidad()).append(":").append(p.getPrecio()).append(",");
+                        cadena.append(p.getNombre()).append(":").append(p.getCantidad()).append(":pedido:").append(p.getPrecio()).append(",");
                     }
                 }
                 if (cadena.length() > 0) {
