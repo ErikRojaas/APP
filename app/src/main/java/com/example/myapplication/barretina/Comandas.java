@@ -42,7 +42,7 @@ public class Comandas extends AppCompatActivity {
         ImageButton novaComanda = findViewById(R.id.novaComanda);
         novaComanda.setOnClickListener(view -> {
             List<ListarTags.Producto> productosMesa = Mesas.comandas.get(Mesas.getNumMesa());
-            if (productosMesa == null || productosMesa.isEmpty()){
+            if (productosMesa == null || productosMesa.isEmpty()) {
                 Toast.makeText(Comandas.this, "No hay ninguna comanda registrada.", Toast.LENGTH_SHORT).show();
             } else {
                 Mesas.comandas.get(Mesas.getNumMesa()).clear();
@@ -62,49 +62,39 @@ public class Comandas extends AppCompatActivity {
         // Configurar el botón ENVIAR
         Button btnEnviar = findViewById(R.id.btnEnviar);
         btnEnviar.setOnClickListener(v -> {
-                if (subida) {
-                    StringBuilder cadena = new StringBuilder();
-                    for (ListarTags.Producto p : Mesas.comandas.get(Mesas.getNumMesa())){
-                        cadena.append(p.toString());
+            if (subida) {
+                StringBuilder cadena = new StringBuilder();
+                for (ListarTags.Producto p : Mesas.comandas.get(Mesas.getNumMesa())) {
+                    if (p.getCantidad() > 1) {
+                        // Calcula el precio unitario
+                        double precioUnitario = p.getPrecio() / p.getCantidad();
+                        for (int i = 0; i < p.getCantidad(); i++) {
+                            cadena.append(p.getNombre()).append(":").append(1).append(":").append(precioUnitario).append(",");
+                        }
+                    } else {
+                        cadena.append(p.getNombre()).append(":").append(p.getCantidad()).append(":").append(p.getPrecio()).append(",");
                     }
-                    insertBase(Mesas.getNumMesa(), String.valueOf(cadena));
-                    subida = false;
-                } else {
-                    StringBuilder cadena = new StringBuilder();
-                    for (ListarTags.Producto p : Mesas.comandas.get(Mesas.getNumMesa())){
-                        cadena.append(p.toString());
-                    }
-                    updateBase(Mesas.getNumMesa(), String.valueOf(cadena));
                 }
+                if (cadena.length() > 0) {
+                    cadena.setLength(cadena.length() - 1); // Eliminar la última coma
                 }
-                //insertBase()
-                //Toast.makeText(Comandas.this, "Has clicado en enviar", Toast.LENGTH_SHORT).show()
-        );
+                insertBase(Mesas.getNumMesa(), cadena.toString());
+                subida = false;
+            } else {
+                StringBuilder cadena = new StringBuilder();
+                for (ListarTags.Producto p : Mesas.comandas.get(Mesas.getNumMesa())) {
+                    cadena.append(p.toString()).append(",");
+                }
+                if (cadena.length() > 0) {
+                    cadena.setLength(cadena.length() - 1); // Eliminar la última coma
+                }
+                updateBase(Mesas.getNumMesa(), cadena.toString());
+            }
+        });
 
         // Configurar el botón ATRÁS
         Button btnAtras = findViewById(R.id.btnAtras);
         btnAtras.setOnClickListener(v -> finish());
-    }
-
-    private void insertBase(String usu){
-        new Thread(() -> {
-            try {
-                //?useSSL=false&logger=com.mysql.cj.log.StandardLogger&logLevel=DEBUG
-                Connection connection = DriverManager.getConnection("jdbc:mysql://10.0.2.2:33007/BarRetina", "xavierik", "X@v13r1k");
-                String query = "INSERT INTO usuario (nombre) VALUES (?)";
-                try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-                    pstmt.setString(1, usu);
-
-                    pstmt.executeUpdate();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //Toast.makeText(Comandas.this, "Conectado peta el insert", Toast.LENGTH_SHORT).show();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                //Toast.makeText(Comandas.this, "falla en el connect", Toast.LENGTH_SHORT).show();
-            }
-        }).start();
     }
 
 
